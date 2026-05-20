@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신유경 · Strategy Planner Portfolio</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FAFAF7;
+    --bg-warm: #F5F1E8;
+    --bg-cool: #F2F6FB;
+    --bg-rose: #FBF5F2;
+    --bg-mint: #F0F7F4;
+    --bg-clinic: #FBF9F4;
+
+    --text: #1A1A1A;
+    --text-mid: #4A4A4A;
+    --text-soft: #8A8580;
+
+    --accent: #1E3A5F;
+    --accent-warm: #B8956A;
+    --accent-rose: #C77B6B;
+    --accent-mint: #5A8F75;
+    --accent-cool: #4A6FA5;
+
+    --highlight: #FFF1B8;
+    --line: #E8E6E0;
+    --line-soft: #F0EEE8;
+
+    --slide-w: 100vw;
+    --slide-h: 100vh;
+  }
+
+  html, body { width: 100%; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-feature-settings: 'tnum' on, 'lnum' on, 'ss03' on;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ===== VERTICAL SECTIONS (was horizontal slides) ===== */
+  .deck {
+    width: 100%;
+    position: relative;
+  }
+  .track {
+    display: block;
+    width: 100%;
+  }
+  .slide {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 0;
+  }
+  .slide:first-child { padding-top: 80px; }
+  .slide-inner {
+    width: 100%; max-width: 1280px;
+    padding: 0 80px;
+  }
+
+  /* ===== COMMON ===== */
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.32em;
+    font-weight: 800; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .chapter-meta {
+    display: flex; align-items: center; gap: 18px;
+    margin-bottom: 20px;
+  }
+  .ch-num { font-size: 12px; font-weight: 800; letter-spacing: 0.3em; color: var(--accent); }
+  .ch-line { flex: 1; max-width: 80px; height: 1px; background: var(--line); }
+  .ch-year { font-size: 12px; font-weight: 600; color: var(--text-soft); letter-spacing: 0.05em; }
+  .ch-title {
+    font-size: 56px; font-weight: 800;
+    letter-spacing: -0.035em; line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  .ch-sub {
+    font-size: 17px; font-style: italic;
+    color: var(--text-mid); letter-spacing: -0.005em;
+    margin-bottom: 36px;
+  }
+
+  .comment {
+    font-style: italic; font-weight: 500;
+    color: var(--text-mid);
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 18px;
+    font-size: 14.5px; line-height: 1.6;
+    margin: 10px 0;
+  }
+
+  .hi { background: linear-gradient(180deg, transparent 60%, var(--highlight) 60%); padding: 0 3px; }
+
+  /* ===== STICKY NAV ===== */
+  .deck-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 18px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(250,250,247,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    transition: all 0.3s;
+  }
+  .deck-name {
+    font-size: 13px; font-weight: 800;
+    letter-spacing: 0.1em; color: var(--text);
+  }
+  .deck-nav-links {
+    display: flex; gap: 24px;
+  }
+  .deck-nav-links a {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    color: var(--text-soft); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .deck-nav-links a:hover { color: var(--accent); }
+  .deck-nav-cta {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+    color: white; background: var(--accent);
+    padding: 8px 16px; border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .deck-nav-cta:hover { background: #0f2540; transform: translateY(-1px); }
+
+  /* SCROLL PROGRESS BAR */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0;
+    height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-warm) 100%);
+    z-index: 101;
+    transition: width 0.1s;
+  }
+
+  /* SCROLL TO TOP BUTTON */
+  .scroll-top-btn {
+    position: fixed; bottom: 32px; right: 32px;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--accent); color: white;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; z-index: 50;
+    box-shadow: 0 8px 24px rgba(30,58,95,0.25);
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+  }
+  .scroll-top-btn.visible {
+    opacity: 1; pointer-events: auto;
+  }
+  .scroll-top-btn:hover {
+    background: #0f2540; transform: translateY(-2px);
+  }
+
+  /* FADE-IN ON SCROLL */
+  .slide {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  .slide.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .slide:first-child {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* SCROLL DOWN HINT (cover slide) */
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 0.25em;
+    color: var(--text-soft); font-weight: 700;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint-line {
+    width: 1px; height: 32px;
+    background: linear-gradient(180deg, transparent, var(--text-soft));
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== SLIDE 1 — COVER ===== */
+  .s-cover {
+    background:
+      radial-gradient(circle at 80% 20%, rgba(255,241,184,0.4) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(184,149,106,0.15) 0%, transparent 50%),
+      var(--bg);
+  }
+  .cover-grid {
+    display: grid; grid-template-columns: 1.3fr 1fr;
+    gap: 80px; align-items: center;
+    width: 100%;
+  }
+  .cover-name {
+    font-size: 128px; font-weight: 800;
+    letter-spacing: -0.05em; line-height: 0.9;
+    margin: 28px 0 32px;
+  }
+  .cover-tag {
+    font-size: 26px; font-weight: 500;
+    line-height: 1.4; letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .cover-sub {
+    font-size: 15px; color: var(--text-soft);
+    font-style: italic; line-height: 1.6;
+  }
+  .cover-stats {
+    display: flex; flex-direction: column; gap: 36px;
+    border-left: 1px solid var(--line); padding-left: 48px;
+  }
+  .stat-num {
+    font-size: 38px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+  .stat-label { font-size: 13px; color: var(--text-soft); margin-top: 4px; }
+
+  /* ===== SLIDE 2 — POSITIONING ===== */
+  .s-positioning {
+    background:
+      radial-gradient(circle at 15% 50%, rgba(184,149,106,0.08) 0%, transparent 60%),
+      var(--bg-warm);
+  }
+  .pos-wrap {
+    max-width: 920px; position: relative;
+  }
+  .pos-quote-mark {
+    font-family: Georgia, serif;
+    font-size: 200px; line-height: 1;
+    color: var(--accent-warm); opacity: 0.25;
+    position: absolute; top: -60px; left: -40px;
+  }
+  .pos-text {
+    font-size: 34px; line-height: 1.45;
+    font-weight: 400; letter-spacing: -0.02em;
+    position: relative; z-index: 1;
+  }
+
+  /* ===== SLIDE 3 — CAREER ARC INTRO ===== */
+  .s-arc-intro {
+    background:
+      radial-gradient(circle at 50% 100%, rgba(30,58,95,0.06) 0%, transparent 70%),
+      var(--bg);
+    text-align: center;
+  }
+  .arc-eyebrow { display: block; margin-bottom: 22px; }
+  .arc-title {
+    font-size: 88px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1.05;
+    margin-bottom: 28px;
+  }
+  .arc-sub {
+    font-size: 21px; color: var(--text-mid);
+    line-height: 1.6; max-width: 680px; margin: 0 auto 56px;
+  }
+
+  /* 4 country badges */
+  .countries {
+    display: flex; justify-content: center; gap: 16px;
+    flex-wrap: wrap; margin-top: 40px;
+  }
+  .country-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 22px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-size: 14px; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .country-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(30,58,95,0.08);
+  }
+  .country-badge .flag { font-size: 18px; }
+  .country-badge .yr { color: var(--text-soft); font-size: 12px; font-weight: 500; }
+
+  /* ===== SLIDE 4 — CH.00 FOUNDATION ===== */
+  .s-foundation {
+    background:
+      radial-gradient(circle at 90% 10%, rgba(199,123,107,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 10% 90%, rgba(74,111,165,0.08) 0%, transparent 50%),
+      var(--bg-warm);
+  }
+  .foundation-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 32px; margin-top: 28px;
+  }
+  .country-card {
+    padding: 36px 32px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    display: flex; flex-direction: column;
+  }
+  .country-card .icon-bg {
+    position: absolute; right: -30px; top: -30px;
+    font-size: 160px; opacity: 0.06;
+    line-height: 1;
+  }
+  .country-card .flag-emoji {
+    font-size: 36px; margin-bottom: 14px;
+  }
+  .country-card .yr-range {
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--text-soft); font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .country-card .place-name {
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.015em; margin-bottom: 6px;
+  }
+  .country-card .place-detail {
+    font-size: 13.5px; color: var(--text-mid);
+    line-height: 1.6; margin-bottom: 20px;
+  }
+  .country-card .place-comment {
+    font-style: italic; font-size: 13.5px;
+    color: var(--text-mid); line-height: 1.6;
+    padding: 14px 0 0 14px; margin-top: auto;
+    border-left: 2px solid var(--accent-warm);
+  }
+
+  .pre-foundation-strip {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 18px; background: white;
+    border-left: 3px solid var(--accent-rose);
+    font-size: 13.5px; color: var(--text-mid);
+    margin-bottom: 24px;
+  }
+  .pre-foundation-strip strong { color: var(--text); }
+  .pre-foundation-strip .nz-flag { font-size: 16px; }
+
+  /* ===== SLIDE 5 — CH.01 FIRST STEP ===== */
+  .s-firststep {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(242,180,65,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(184,149,106,0.08) 0%, transparent 50%),
+      var(--bg);
+  }
+  .fs-content { display: grid; grid-template-columns: 1.3fr 1fr; gap: 56px; align-items: start; }
+  .role-block {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .role-block:last-child { border-bottom: none; }
+  .role-period {
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--text-soft); font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .role-org { font-size: 20px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.01em; }
+  .role-list { list-style: none; padding: 0; }
+  .role-list li {
+    font-size: 14px; padding: 5px 0 5px 18px;
+    color: var(--text-mid); position: relative;
+    line-height: 1.55;
+  }
+  .role-list li::before {
+    content: ''; position: absolute; left: 0; top: 13px;
+    width: 8px; height: 1px; background: var(--accent);
+  }
+  .role-list li.shine {
+    color: var(--accent); font-weight: 700;
+    background: linear-gradient(90deg, rgba(255,241,184,0.4) 0%, transparent 80%);
+    padding-left: 18px; margin-left: -4px;
+    padding-top: 6px; padding-bottom: 6px;
+    border-radius: 4px;
+  }
+  .role-list li.shine::before { background: var(--accent-warm); top: 16px; left: 4px; }
+  .fs-visual {
+    background: linear-gradient(135deg, #FFF8DC 0%, #FFE8A8 100%);
+    border-radius: 12px;
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    min-height: 360px;
+  }
+  .fs-visual::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.5;
+  }
+  .fs-visual-content { position: relative; z-index: 1; }
+  .fs-stat-big {
+    font-size: 72px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.04em;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .fs-stat-label { font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 28px; }
+  .fs-stats-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .fs-stat-small { }
+  .fs-stat-small .n { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+  .fs-stat-small .l { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+  .fs-icons {
+    margin-top: 32px;
+    display: flex; gap: 14px;
+    font-size: 24px;
+    opacity: 0.7;
+  }
+
+  /* ===== SLIDE 6 — CH.02 FOUNDER ATTEMPT ===== */
+  .s-founder {
+    background:
+      radial-gradient(circle at 80% 20%, rgba(74,111,165,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(199,123,107,0.08) 0%, transparent 50%),
+      var(--bg-cool);
+  }
+  .founder-flow {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px; margin-top: 20px;
+  }
+  .founder-phase-card {
+    padding: 28px 24px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+    min-height: 340px;
+    display: flex; flex-direction: column;
+  }
+  .founder-phase-card .icon {
+    font-size: 32px; margin-bottom: 14px;
+  }
+  .founder-tag {
+    display: inline-block; font-size: 10px;
+    letter-spacing: 0.25em; font-weight: 800;
+    padding: 5px 11px; border-radius: 3px;
+    margin-bottom: 16px;
+    align-self: flex-start;
+  }
+  .founder-tag.rise { background: rgba(184,149,106,0.15); color: var(--accent-warm); }
+  .founder-tag.attempt { background: rgba(74,111,165,0.15); color: var(--accent-cool); }
+  .founder-tag.fall { background: rgba(199,123,107,0.15); color: var(--accent-rose); }
+  .founder-headline {
+    font-size: 17px; font-weight: 800;
+    margin-bottom: 14px; letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .founder-body {
+    font-size: 13.5px; color: var(--text-mid);
+    line-height: 1.65; margin-bottom: 16px;
+  }
+  .founder-comment {
+    font-style: italic; font-size: 12.5px;
+    color: var(--text-mid); line-height: 1.5;
+    padding: 12px 0 0 12px;
+    border-left: 2px solid var(--accent);
+    margin-top: auto;
+  }
+  .founder-australia-note {
+    margin-top: 24px;
+    padding: 16px 24px;
+    background: rgba(74,111,165,0.06);
+    border-radius: 6px;
+    font-size: 13px; color: var(--text-mid);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .founder-australia-note .au-icons {
+    font-size: 22px; flex-shrink: 0;
+  }
+  .founder-australia-note strong { color: var(--accent-cool); font-weight: 700; }
+  .founder-parallel {
+    margin-top: 14px;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.6);
+    border-left: 2px solid var(--accent-warm);
+    font-size: 12.5px; color: var(--text-soft);
+    font-style: italic;
+  }
+
+  /* ===== SLIDE 7 — CH.03 EUREKA (intro) ===== */
+  .s-eureka-intro {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(184,149,106,0.15) 0%, transparent 55%),
+      var(--bg-clinic);
+    position: relative;
+  }
+  .s-eureka-intro::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(184,149,106,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(184,149,106,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+  .pivotal-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 9px 20px; background: white;
+    border: 1.5px solid var(--accent-warm);
+    border-radius: 100px; font-size: 11px;
+    letter-spacing: 0.25em; font-weight: 800;
+    color: var(--accent-warm); margin-bottom: 24px;
+  }
+  .eureka-intro-title { color: var(--text); }
+  .eureka-role-line {
+    font-size: 18px; color: var(--text-mid);
+    line-height: 1.6; margin-bottom: 32px;
+  }
+  .eureka-role-line strong { color: var(--text); font-weight: 700; }
+  .eureka-role-line .setup-badge {
+    display: inline-block;
+    color: var(--accent-warm); font-weight: 800;
+    background: rgba(184,149,106,0.12);
+    padding: 2px 10px; border-radius: 4px;
+    font-size: 16px;
+  }
+
+  /* What I did */
+  .eureka-actions {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin: 24px 0;
+  }
+  .action-card {
+    padding: 20px 18px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+  }
+  .action-card:hover { transform: translateY(-2px); border-color: var(--accent-warm); }
+  .action-icon {
+    font-size: 24px; margin-bottom: 10px;
+  }
+  .action-title {
+    font-size: 13px; font-weight: 800;
+    margin-bottom: 6px; letter-spacing: -0.01em;
+  }
+  .action-desc { font-size: 12px; color: var(--text-soft); line-height: 1.5; }
+
+  .eureka-results {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-top: 16px;
+  }
+  .result-card {
+    padding: 22px 18px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .result-num {
+    font-size: 36px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.03em;
+    line-height: 1; margin-bottom: 8px;
+  }
+  .result-label { font-size: 12px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ===== SLIDE 8 — CH.03 EUREKA (quote) ===== */
+  .s-eureka-quote {
+    background:
+      radial-gradient(circle at 80% 80%, rgba(184,149,106,0.1) 0%, transparent 60%),
+      var(--bg-warm);
+  }
+  .eq-wrap {
+    max-width: 880px;
+    padding: 56px 64px;
+    background: white;
+    border-radius: 12px;
+    border-left: 5px solid var(--accent-warm);
+    position: relative;
+    overflow: hidden;
+  }
+  .eq-wrap::before {
+    content: '"';
+    font-family: Georgia, serif;
+    font-size: 200px; color: var(--accent-warm);
+    opacity: 0.15; position: absolute;
+    top: -20px; right: 24px; line-height: 1;
+  }
+  .eq-label {
+    font-size: 11px; letter-spacing: 0.3em;
+    color: var(--accent-warm); font-weight: 800;
+    margin-bottom: 28px; display: block;
+  }
+  .eq-p {
+    font-size: 22px; line-height: 1.55;
+    color: var(--text); font-weight: 400;
+    letter-spacing: -0.015em;
+    margin-bottom: 18px;
+  }
+  .eq-p:last-of-type { margin-bottom: 28px; }
+  .eq-p strong {
+    background: var(--highlight);
+    padding: 0 5px; font-weight: 700;
+  }
+  .eq-comments {
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .eq-comments .comment { margin: 8px 0; font-size: 13.5px; }
+
+  /* ===== SLIDE 9 — CH.04 SCALE UP ===== */
+  .s-scale {
+    background:
+      radial-gradient(circle at 20% 30%, rgba(74,111,165,0.08) 0%, transparent 55%),
+      var(--bg-cool);
+  }
+  .scale-header { display: grid; grid-template-columns: 1.5fr 1fr; gap: 56px; align-items: end; }
+  .scale-role { font-size: 16px; color: var(--text-mid); line-height: 1.65; margin-bottom: 16px; }
+  .scale-role strong { color: var(--text); font-weight: 700; }
+  .scale-diagram {
+    padding: 32px 28px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+  }
+  .scale-d-title {
+    font-size: 11px; letter-spacing: 0.25em;
+    color: var(--text-soft); font-weight: 800;
+    text-align: center; margin-bottom: 20px;
+  }
+  .scale-stages {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 16px;
+  }
+  .scale-stage {
+    padding: 18px 14px; background: var(--bg-warm);
+    border-radius: 6px; text-align: center;
+  }
+  .scale-stage.now { background: var(--accent); color: white; }
+  .scale-stage-label {
+    font-size: 9.5px; letter-spacing: 0.25em;
+    font-weight: 800; color: var(--text-soft);
+    margin-bottom: 8px;
+  }
+  .scale-stage.now .scale-stage-label { color: rgba(255,255,255,0.7); }
+  .scale-stage-org { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+  .scale-stage-unit { font-size: 12px; color: var(--text-mid); line-height: 1.4; }
+  .scale-stage.now .scale-stage-unit { color: rgba(255,255,255,0.85); }
+  .scale-arrow { color: var(--accent); font-size: 22px; font-weight: 300; }
+
+  .scale-list-wrap { margin-top: 32px; }
+  .scale-list-label {
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--text-soft); font-weight: 800;
+    margin-bottom: 14px;
+  }
+  .scale-list {
+    list-style: none; padding: 0;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 32px;
+  }
+  .scale-list li {
+    font-size: 13.5px; color: var(--text-mid);
+    padding: 6px 0 6px 18px; position: relative;
+    line-height: 1.55;
+  }
+  .scale-list li::before {
+    content: ''; position: absolute; left: 0; top: 14px;
+    width: 8px; height: 1px; background: var(--accent);
+  }
+  .scale-comments-row { margin-top: 24px; }
+
+  /* ===== SLIDE 10 — CH.05 NEXT ===== */
+  .s-next {
+    background:
+      radial-gradient(circle at 50% 60%, rgba(255,241,184,0.4) 0%, transparent 60%),
+      var(--bg);
+    text-align: center;
+  }
+  .next-title {
+    font-size: 72px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1.05;
+    margin: 20px 0 16px;
+  }
+  .next-sub {
+    font-size: 19px; color: var(--text-mid);
+    margin-bottom: 48px;
+  }
+  .next-evo {
+    display: flex; justify-content: center; align-items: center;
+    gap: 14px; flex-wrap: wrap; margin-bottom: 40px;
+  }
+  .next-card {
+    padding: 18px 24px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    text-align: left; min-width: 200px;
+  }
+  .next-card.future {
+    background: var(--accent); color: white;
+    border-color: var(--accent);
+    box-shadow: 0 12px 32px rgba(30,58,95,0.25);
+    transform: scale(1.05);
+  }
+  .next-c-label {
+    font-size: 10px; letter-spacing: 0.2em;
+    font-weight: 800; color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+  .next-card.future .next-c-label { color: rgba(255,255,255,0.7); }
+  .next-c-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+  .next-c-detail { font-size: 12.5px; color: var(--text-mid); }
+  .next-card.future .next-c-detail { color: rgba(255,255,255,0.9); }
+  .next-arrow { color: var(--text-soft); font-size: 22px; }
+  .next-msg {
+    max-width: 720px; margin: 0 auto;
+    font-size: 17px; line-height: 1.7; color: var(--text-mid);
+  }
+  .next-msg strong { color: var(--accent); font-weight: 700; }
+
+  /* ===== SLIDE 11 — MY FOUR PILLARS (NEW) ===== */
+  .s-pillars {
+    background:
+      radial-gradient(circle at 0% 0%, rgba(255,241,184,0.4) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(184,149,106,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(74,111,165,0.05) 0%, transparent 60%),
+      var(--bg);
+  }
+  .pillars-head { text-align: center; margin-bottom: 36px; }
+  .pillars-eyebrow { display: block; margin-bottom: 14px; color: var(--accent-warm); }
+  .pillars-title {
+    font-size: 52px; font-weight: 800;
+    letter-spacing: -0.035em; line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .pillars-sub {
+    font-size: 17px; color: var(--text-mid);
+    max-width: 640px; margin: 0 auto;
+  }
+  .pillars-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .pillar-card {
+    padding: 32px 28px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.25s;
+    overflow: hidden;
+  }
+  .pillar-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--accent);
+  }
+  .pillar-card:nth-child(1)::before { background: #F2B441; }
+  .pillar-card:nth-child(2)::before { background: var(--accent-warm); }
+  .pillar-card:nth-child(3)::before { background: var(--accent-mint); }
+  .pillar-card:nth-child(4)::before { background: var(--accent-cool); }
+  .pillar-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(30,58,95,0.08);
+  }
+  .pillar-icon {
+    font-size: 32px; margin-bottom: 14px;
+  }
+  .pillar-num {
+    font-size: 11px; font-weight: 800;
+    color: var(--text-soft); letter-spacing: 0.3em;
+    margin-bottom: 6px;
+  }
+  .pillar-name {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.02em; margin-bottom: 6px;
+    line-height: 1.15;
+  }
+  .pillar-tag {
+    font-size: 12px; color: var(--accent-warm);
+    font-weight: 700; letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+  .pillar-card:nth-child(1) .pillar-tag { color: #C68F1E; }
+  .pillar-card:nth-child(3) .pillar-tag { color: var(--accent-mint); }
+  .pillar-card:nth-child(4) .pillar-tag { color: var(--accent-cool); }
+  .pillar-desc {
+    font-size: 14px; color: var(--text);
+    line-height: 1.7; margin-bottom: 16px;
+  }
+  .pillar-evidence {
+    font-size: 12px; color: var(--text-soft);
+    line-height: 1.6;
+    padding: 12px 14px;
+    background: var(--bg-warm);
+    border-radius: 6px;
+    font-style: italic;
+  }
+  .pillars-bonus {
+    margin-top: 20px;
+    padding: 20px 28px;
+    background: white;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .pillars-bonus-icon {
+    font-size: 28px; flex-shrink: 0;
+  }
+  .pillars-bonus-text {
+    font-size: 13.5px; color: var(--text-mid);
+    line-height: 1.65;
+  }
+  .pillars-bonus-text strong {
+    color: var(--accent); font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== SLIDE 12 — OUTCOMES ===== */
+  .s-outcomes {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(30,58,95,0.06) 0%, transparent 50%),
+      var(--bg);
+  }
+  .out-head { text-align: center; margin-bottom: 48px; }
+  .out-eyebrow { display: block; margin-bottom: 16px; }
+  .out-title {
+    font-size: 56px; font-weight: 800;
+    letter-spacing: -0.035em; margin-bottom: 14px;
+  }
+  .out-sub { font-size: 17px; color: var(--text-mid); }
+  .out-metrics {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .out-card {
+    padding: 36px 28px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    transition: all 0.25s;
+  }
+  .out-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 16px 40px rgba(30,58,95,0.1);
+  }
+  .out-num {
+    font-size: 64px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.045em;
+    line-height: 1; margin-bottom: 20px;
+  }
+  .out-num .u { font-size: 28px; font-weight: 700; margin-left: 2px; }
+  .out-card-label {
+    font-size: 14.5px; color: var(--text);
+    font-weight: 700; margin-bottom: 6px;
+  }
+  .out-card-ctx { font-size: 12px; color: var(--text-soft); }
+  .out-secondary {
+    margin-top: 36px; padding-top: 28px;
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: center; gap: 36px;
+    flex-wrap: wrap;
+  }
+  .out-secondary-item {
+    font-size: 13.5px; color: var(--text-mid);
+  }
+  .out-secondary-item strong { color: var(--accent); font-weight: 800; }
+
+  /* ===== SLIDE 12 — SYSTEM BUILDER ===== */
+  .s-system {
+    background:
+      radial-gradient(circle at 90% 90%, rgba(90,143,117,0.08) 0%, transparent 60%),
+      var(--bg-mint);
+  }
+  .sys-header { margin-bottom: 36px; }
+  .sys-eyebrow { color: var(--accent-mint); margin-bottom: 14px; display: block; }
+  .sys-title { font-size: 48px; font-weight: 800; letter-spacing: -0.035em; margin-bottom: 12px; }
+  .sys-sub { font-size: 16px; color: var(--text-mid); }
+  .sys-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .sys-narr p {
+    font-size: 15.5px; color: var(--text-mid);
+    line-height: 1.75; margin-bottom: 14px;
+  }
+  .sys-narr strong { color: var(--text); font-weight: 700; }
+  .ba-tbl {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 4px 28px;
+  }
+  .ba-row {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .ba-row:last-child { border-bottom: none; }
+  .ba-before {
+    font-size: 13.5px; color: var(--text-soft);
+    text-align: right;
+  }
+  .ba-arrow { color: var(--accent-mint); font-weight: 800; font-size: 16px; }
+  .ba-after {
+    font-size: 13.5px; color: var(--text);
+    font-weight: 700;
+  }
+
+  /* ===== SLIDE 13 — AI WORKFLOW ===== */
+  .s-ai {
+    background:
+      radial-gradient(circle at 30% 50%, rgba(74,111,165,0.1) 0%, transparent 55%),
+      radial-gradient(circle at 70% 50%, rgba(184,149,106,0.08) 0%, transparent 55%),
+      var(--bg-cool);
+  }
+  .ai-head { text-align: center; margin-bottom: 48px; }
+  .ai-eyebrow { color: var(--accent-cool); display: block; margin-bottom: 14px; }
+  .ai-title { font-size: 48px; font-weight: 800; letter-spacing: -0.035em; margin-bottom: 12px; }
+  .ai-sub { font-size: 16px; color: var(--text-mid); }
+  .ai-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    gap: 6px;
+  }
+  .ai-step {
+    padding: 28px 22px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .ai-step:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(74,111,165,0.1); }
+  .ai-step.outcome { background: var(--accent-cool); color: white; border-color: var(--accent-cool); }
+  .ai-icon { font-size: 30px; margin-bottom: 12px; }
+  .ai-tool {
+    font-size: 15px; font-weight: 800;
+    color: var(--accent-cool); margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .ai-step.outcome .ai-tool { color: white; }
+  .ai-use {
+    font-size: 12.5px; color: var(--text-soft);
+    line-height: 1.55;
+  }
+  .ai-step.outcome .ai-use { color: rgba(255,255,255,0.85); }
+  .ai-arr { color: var(--accent-cool); font-size: 18px; align-self: center; opacity: 0.5; }
+  .ai-outcome-row {
+    text-align: center; margin-top: 40px;
+    padding: 22px 36px; background: white;
+    border-radius: 100px; display: inline-block;
+    border: 1px solid var(--line);
+    margin: 40px auto 0;
+  }
+  .ai-outcome-wrap { text-align: center; }
+  .ai-out-text { font-size: 15.5px; color: var(--text-mid); }
+  .ai-out-num {
+    font-size: 24px; font-weight: 800;
+    color: var(--accent-cool); margin: 0 8px;
+    letter-spacing: -0.02em;
+  }
+
+  /* ===== SLIDE 14 — WHY ME ===== */
+  .s-whyme {
+    background:
+      radial-gradient(circle at 0% 100%, rgba(255,241,184,0.3) 0%, transparent 60%),
+      var(--bg);
+  }
+  .wm-head { margin-bottom: 36px; }
+  .wm-eyebrow { display: block; margin-bottom: 14px; }
+  .wm-title { font-size: 48px; font-weight: 800; letter-spacing: -0.035em; }
+  .diff-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .diff-card {
+    padding: 32px 28px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+  .diff-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 12px 32px rgba(30,58,95,0.06);
+    transform: translateY(-2px);
+  }
+  .diff-icon { font-size: 26px; margin-bottom: 12px; }
+  .diff-num {
+    font-size: 11px; font-weight: 800;
+    color: var(--accent); letter-spacing: 0.25em;
+    margin-bottom: 12px;
+  }
+  .diff-title {
+    font-size: 21px; font-weight: 800;
+    margin-bottom: 12px; letter-spacing: -0.015em;
+  }
+  .diff-desc {
+    font-size: 13.5px; color: var(--text-mid);
+    line-height: 1.7;
+  }
+
+  /* ===== SLIDE 15 (used as 14 actually) — ROADMAP ===== */
+  .s-roadmap {
+    background:
+      radial-gradient(circle at 100% 0%, rgba(184,149,106,0.1) 0%, transparent 60%),
+      var(--bg-warm);
+  }
+  .rm-head { margin-bottom: 40px; }
+  .rm-eyebrow { display: block; margin-bottom: 14px; }
+  .rm-title { font-size: 48px; font-weight: 800; letter-spacing: -0.035em; margin-bottom: 12px; }
+  .rm-sub { font-size: 16px; color: var(--text-mid); max-width: 720px; }
+  .rm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .rm-card {
+    padding: 32px 26px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    position: relative; overflow: hidden;
+  }
+  .rm-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: var(--accent);
+  }
+  .rm-card:nth-child(1)::before { opacity: 0.35; }
+  .rm-card:nth-child(2)::before { opacity: 0.65; }
+  .rm-period {
+    font-size: 11px; color: var(--accent);
+    font-weight: 800; letter-spacing: 0.25em;
+    margin-bottom: 10px;
+  }
+  .rm-phase {
+    font-size: 21px; font-weight: 800;
+    margin-bottom: 22px; letter-spacing: -0.015em;
+  }
+  .rm-list { list-style: none; padding: 0; }
+  .rm-list li {
+    font-size: 13.5px; color: var(--text-mid);
+    padding: 10px 0 10px 16px; position: relative;
+    line-height: 1.6;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .rm-list li:last-child { border-bottom: none; }
+  .rm-list li::before {
+    content: ''; position: absolute;
+    left: 0; top: 18px; width: 8px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* ===== SLIDE 16 — CLOSING ===== */
+  .s-closing {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,241,184,0.5) 0%, transparent 65%),
+      var(--bg);
+    text-align: center;
+  }
+  .closing-wrap { max-width: 920px; }
+  .closing-quote {
+    font-size: 34px; font-weight: 500;
+    line-height: 1.5; letter-spacing: -0.025em;
+    margin-bottom: 40px;
+  }
+  .closing-quote .hi {
+    background: linear-gradient(180deg, transparent 60%, var(--highlight) 60%);
+    padding: 0 6px;
+  }
+  .closing-name { font-size: 14px; color: var(--text-soft); letter-spacing: 0.05em; margin-bottom: 56px; }
+
+  .contact-box {
+    display: inline-flex; align-items: center;
+    gap: 0; padding: 16px 36px;
+    background: white;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    font-size: 16px; font-weight: 600;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.04);
+  }
+  .contact-box a { color: var(--text); text-decoration: none; }
+  .contact-box a:hover { color: var(--accent); }
+  .contact-sep { color: var(--line); margin: 0 18px; }
+  .closing-meta {
+    margin-top: 40px;
+    font-size: 11px; color: var(--text-soft);
+    letter-spacing: 0.12em; line-height: 1.9;
+    text-transform: uppercase;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1100px) {
+    .slide-inner { padding: 0 48px; }
+    .ch-title { font-size: 44px; }
+    .cover-name { font-size: 88px; }
+    .arc-title { font-size: 64px; }
+    .next-title { font-size: 56px; }
+    .out-title, .sys-title, .ai-title, .wm-title, .rm-title { font-size: 40px; }
+    .closing-quote { font-size: 26px; }
+    .ai-flow { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ai-arr { display: none; }
+    .eureka-actions { grid-template-columns: 1fr 1fr; }
+    .out-metrics { grid-template-columns: repeat(2, 1fr); }
+    .eureka-results { grid-template-columns: repeat(2, 1fr); }
+    .scale-list { grid-template-columns: 1fr; }
+    .pillars-title { font-size: 38px; }
+  }
+  @media (max-width: 720px) {
+    .slide { padding: 80px 0; min-height: auto; }
+    .slide-inner { padding: 0 24px; }
+    .deck-nav { padding: 14px 20px; }
+    .deck-nav-links { display: none; }
+    .deck-nav-cta { padding: 6px 12px; font-size: 11px; }
+    .scroll-top-btn { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+    .ch-title { font-size: 32px; }
+    .cover-grid { grid-template-columns: 1fr; gap: 32px; }
+    .cover-name { font-size: 60px; }
+    .cover-stats { border-left: none; border-top: 1px solid var(--line); padding: 24px 0 0; flex-direction: row; gap: 20px; flex-wrap: wrap; }
+    .stat-num { font-size: 22px; }
+    .stat-label { font-size: 11px; }
+    .arc-title { font-size: 40px; }
+    .arc-sub { font-size: 16px; }
+    .foundation-grid { grid-template-columns: 1fr; gap: 16px; }
+    .country-card { min-height: 220px; padding: 24px 20px; }
+    .fs-content { grid-template-columns: 1fr; gap: 32px; }
+    .founder-flow { grid-template-columns: 1fr; }
+    .founder-phase-card { min-height: auto; }
+    .scale-header { grid-template-columns: 1fr; gap: 28px; }
+    .scale-stages { grid-template-columns: 1fr; }
+    .scale-arrow { transform: rotate(90deg); }
+    .next-evo { flex-direction: column; }
+    .next-arrow { transform: rotate(90deg); }
+    .out-metrics, .eureka-results, .diff-grid, .rm-grid { grid-template-columns: 1fr; }
+    .pillars-grid { grid-template-columns: 1fr; gap: 14px; }
+    .pillar-card { padding: 24px 20px; }
+    .pillar-name { font-size: 22px; }
+    .ai-flow { grid-template-columns: 1fr; }
+    .sys-grid { grid-template-columns: 1fr; gap: 32px; }
+    .pos-text { font-size: 22px; }
+    .pos-quote-mark { font-size: 120px; top: -30px; left: -20px; }
+    .eq-wrap { padding: 32px 24px; }
+    .eq-p { font-size: 17px; }
+    .closing-quote { font-size: 22px; }
+    .contact-box { font-size: 14px; padding: 12px 24px; flex-wrap: wrap; }
+    .scroll-hint { bottom: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="progress"></div>
+
+<nav class="deck-nav">
+  <div class="deck-name">SHIN YUKYUNG · PORTFOLIO</div>
+  <div class="deck-nav-links">
+    <a href="#career">CAREER</a>
+    <a href="#pillars">PILLARS</a>
+    <a href="#outcomes">OUTCOMES</a>
+    <a href="#roadmap">ROADMAP</a>
+  </div>
+  <a href="#closing" class="deck-nav-cta">CONTACT</a>
+</nav>
+
+<button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top">↑</button>
+
+<div class="deck">
+  <div class="track" id="track">
+
+    <!-- SLIDE 1 — COVER -->
+    <section class="slide s-cover" id="top">
+      <div class="slide-inner">
+        <div class="cover-grid">
+          <div>
+            <span class="eyebrow">STRATEGY PLANNER · PORTFOLIO</span>
+            <h1 class="cover-name">신유경</h1>
+            <p class="cover-tag">병원의 성장 구조를 설계하는 전략기획자.</p>
+            <p class="cover-sub">다지점 표준화에서 다국가 메디컬뷰티까지<br>운영 단위를 한 단계씩 키워온 전략기획자.</p>
+          </div>
+          <div class="cover-stats">
+            <div>
+              <div class="stat-num">11년+</div>
+              <div class="stat-label">실무 경력 (정규직 6년+)</div>
+            </div>
+            <div>
+              <div class="stat-num">4개국 · 4개 산업</div>
+              <div class="stat-label">결제 · 유학 · 뷰티 · 의료관광</div>
+            </div>
+            <div>
+              <div class="stat-num">HSK 6 / MSc</div>
+              <div class="stat-label">중국어 · 영국 석사 (조직심리)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-hint">
+        SCROLL
+        <div class="scroll-hint-line"></div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 — POSITIONING -->
+    <section class="slide s-positioning">
+      <div class="slide-inner">
+        <div class="pos-wrap">
+          <div class="pos-quote-mark">"</div>
+          <p class="pos-text">
+            다지점 운영 표준화 <span class="hi">(매출 안정화 80% · 전환율 +7%p · 재방문률 +10%p)</span>와 글로벌 의료관광 플랫폼 운영을 동시에 갖춘 전략기획자. <span class="hi">OKR과 AI를 활용해 무체계 조직에 시스템을 심어본</span> 시스템 빌더.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 — CAREER ARC INTRO -->
+    <section class="slide s-arc-intro" id="career">
+      <div class="slide-inner">
+        <span class="eyebrow arc-eyebrow">CAREER ARC</span>
+        <h2 class="arc-title">어떻게 살아왔는가</h2>
+        <p class="arc-sub">네 나라에서 살았고, 네 산업을 거쳤다.<br>같은 역량을 더 큰 스케일과 더 글로벌한 구조로 확장해온 흐름.</p>
+        <div class="countries">
+          <div class="country-badge"><span class="flag">🇳🇿</span> 뉴질랜드 <span class="yr">· 어학연수</span></div>
+          <div class="country-badge"><span class="flag">🇨🇳</span> 중국 <span class="yr">· 학부</span></div>
+          <div class="country-badge"><span class="flag">🇬🇧</span> 영국 <span class="yr">· 석사</span></div>
+          <div class="country-badge"><span class="flag">🇦🇺</span> 호주 <span class="yr">· 창업기</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 — CH.00 FOUNDATION -->
+    <section class="slide s-foundation">
+      <div class="slide-inner">
+        <div class="chapter-meta">
+          <span class="ch-num">CH.00</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">학습기</span>
+        </div>
+        <h3 class="ch-title">FOUNDATION ✈️ 🎓</h3>
+        <p class="ch-sub">세상을 두 나라로 바꾼 시기</p>
+
+        <div class="pre-foundation-strip">
+          <span class="nz-flag">🇳🇿</span> <span><strong>16세 · 뉴질랜드</strong> — 어학연수. 처음으로 한국 바깥의 세상을 봤다.</span>
+        </div>
+
+        <div class="foundation-grid">
+          <div class="country-card">
+            <div class="icon-bg">🏛️</div>
+            <div class="flag-emoji">🇨🇳</div>
+            <div class="yr-range">학부 · 국제무역경제</div>
+            <div class="place-name">중국 대외경제무역대 (UIBE)</div>
+            <div class="place-detail">국제무역경제학부 · HSK 6급 취득.<br>중한 번역 프리랜서 시작 (이후 9년 누적).</div>
+            <div class="place-comment">"관광객도 학생도 아닌, 중국 안의 사람으로 살았다 — 중국이라는 시장을 책이 아니라 일상으로 익혔다."</div>
+          </div>
+          <div class="country-card">
+            <div class="icon-bg">🎓</div>
+            <div class="flag-emoji">🇬🇧</div>
+            <div class="yr-range">석사 · 조직심리학</div>
+            <div class="place-name">Kingston University · MSc</div>
+            <div class="place-detail">Occupational Business Psychology.<br>졸업논문: Job Satisfaction among Millennials.</div>
+            <div class="place-comment">"사람은 무엇으로 일하는가가 궁금했다 — 그래서 조직심리를 골랐다."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 — CH.01 FIRST STEP -->
+    <section class="slide s-firststep">
+      <div class="slide-inner">
+        <div class="chapter-meta">
+          <span class="ch-num">CH.01</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">스타트업 입성기</span>
+        </div>
+        <h3 class="ch-title">FIRST STEP 🚀</h3>
+        <p class="ch-sub">사원으로 입사해 팀장까지 — 그릿 정신을 몸으로 익힌 시기</p>
+
+        <div class="fs-content">
+          <div>
+            <div class="role-block">
+              <div class="role-period">머지홀딩스 — 입사기</div>
+              <div class="role-org">마케팅팀 사원</div>
+              <ul class="role-list">
+                <li>외식 산업 및 E-commerce 시장 조사</li>
+                <li>신서비스 머지플러스 기획 참여</li>
+                <li>UI 기획 참여</li>
+                <li class="shine">⚡ 사원이지만 IR Deck까지 작성</li>
+              </ul>
+            </div>
+
+            <div class="role-block">
+              <div class="role-period">머지홀딩스 — 성장기</div>
+              <div class="role-org">머지서포터 · 사원에서 팀장까지</div>
+              <ul class="role-list">
+                <li>브랜드 입점 · 운영 · 이벤트 기획 전반 담당</li>
+                <li>주임 → 계장 → 팀장으로 직책 상승</li>
+                <li class="shine">⚡ 98개 브랜드 입점 · 이벤트 평균 매출 +260%</li>
+              </ul>
+            </div>
+
+            <p class="comment" style="margin-top: 20px;">"사원에서 팀장까지 — 무엇이든 다 했고, 안 되면 되게 했다."</p>
+            <p class="comment">"이때 배운 그릿 정신이 이후 모든 일의 기반이 됐다."</p>
+          </div>
+
+          <div class="fs-visual">
+            <div class="fs-visual-content">
+              <div class="fs-stat-big">+260%</div>
+              <div class="fs-stat-label">이벤트 평균 매출 증가</div>
+              <div class="fs-stats-row">
+                <div class="fs-stat-small">
+                  <div class="n">98</div>
+                  <div class="l">브랜드 입점</div>
+                </div>
+                <div class="fs-stat-small">
+                  <div class="n">사원→팀장</div>
+                  <div class="l">성장 트랙</div>
+                </div>
+              </div>
+              <div class="fs-icons">📊 💡 🎯 ⚡ 📝</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 — CH.02 FOUNDER ATTEMPT -->
+    <section class="slide s-founder">
+      <div class="slide-inner">
+        <div class="chapter-meta">
+          <span class="ch-num">CH.02</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">창업 시도기</span>
+        </div>
+        <h3 class="ch-title">FOUNDER ATTEMPT 🌍</h3>
+        <p class="ch-sub">기획자에서 창업자로, 호주까지 갔다 — 그리고 시장 타이밍을 배우다</p>
+
+        <div class="founder-flow">
+          <div class="founder-phase-card">
+            <div class="icon">📈</div>
+            <span class="founder-tag rise">RISE</span>
+            <div class="founder-headline">어브로딘 사업기획 팀장</div>
+            <p class="founder-body">머지에서 시작한 IR 경험을 본격화 — 투자자 회신율·재미팅 요청률 상승. 신사업 BM End-to-End 주도: 시장 분석 → BM 설계 → 실행 로드맵 → 파일럿 운영. <strong>실전에서 부딪히며 사업 구조화를 배웠다.</strong></p>
+            <p class="founder-comment">"기획 한 명이 회사 한 곳을 움직일 수 있다는 걸 봤다."</p>
+          </div>
+
+          <div class="founder-phase-card">
+            <div class="icon">🇦🇺 ✈️</div>
+            <span class="founder-tag attempt">ATTEMPT</span>
+            <div class="founder-headline">유학원 플랫폼 창업 시도</div>
+            <p class="founder-body">어브로딘에서 본 시장의 빈틈을 직접 메우려 했다. 시장 리서치와 현지 파트너십 모색을 위해 <strong>호주에 직접 가서 살았다</strong>. 책상이 아니라 현지에서 시작했다.</p>
+            <p class="founder-comment">"타인의 사업이 아니라 내 사업을 만들고 싶었다."</p>
+          </div>
+
+          <div class="founder-phase-card">
+            <div class="icon">🦠</div>
+            <span class="founder-tag fall">FALL</span>
+            <div class="founder-headline">COVID-19 · 시장 붕괴</div>
+            <p class="founder-body">국경이 닫혔고, 유학 시장 자체가 꺼졌다. 처음으로 사업의 통제 바깥에 있는 변수 — '시장 타이밍'을 배웠다. 실패가 아니라, 더 큰 책을 한 권 읽은 셈.</p>
+            <p class="founder-comment">"코로나가 시장을 꺼뜨렸다. '시장 타이밍'을 처음으로 배웠다."</p>
+          </div>
+        </div>
+
+        <div class="founder-australia-note">
+          <span class="au-icons">🇦🇺 🌏 ✈️</span>
+          <span><strong>호주 체류 · 시장 리서치 + 현지 파트너십 모색.</strong> 사업을 머리가 아니라 발로 검증하는 방식 — 이때 익혔다.</span>
+        </div>
+
+        <div class="founder-parallel">
+          ▸ 이 시기 병행 · 중한/영한 번역 프리랜서 (pacer international) · 누적 9년
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 — CH.03 EUREKA (intro) -->
+    <section class="slide s-eureka-intro">
+      <div class="slide-inner">
+        <div class="pivotal-badge">⭐ PIVOTAL CHAPTER</div>
+        <div class="chapter-meta">
+          <span class="ch-num">CH.03</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">약 2년 · 셋업 시기</span>
+        </div>
+        <h3 class="ch-title eureka-intro-title">EUREKA 💡</h3>
+        <p class="ch-sub">의료·뷰티에 눈을 번쩍 뜬 시기 — 진짜 0에서 1을 만든 시간</p>
+
+        <p class="eureka-role-line">
+          <strong>디렉터홀딩스 네트워크본부 본부장</strong>으로, 전국 피부과 네트워크의 <span class="setup-badge">완전 셋업멤버</span> — 시스템도, 매뉴얼도, 콜센터도 없는 곳에서 <strong>0에서 1을 만들었다.</strong>
+        </p>
+
+        <div class="eureka-actions">
+          <div class="action-card">
+            <div class="action-icon">🏥</div>
+            <div class="action-title">병원 MOT 설계</div>
+            <div class="action-desc">예약·내원·상담·시술·사후 전 접점 고객 경험 설계</div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon">📞</div>
+            <div class="action-title">콜센터 상담체계 구축</div>
+            <div class="action-desc">상담 스크립트 · 응대 매뉴얼 · 인입 분배 체계 처음부터</div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon">🎯</div>
+            <div class="action-title">OKR · KPI 체계 도입</div>
+            <div class="action-desc">지점별 핵심 지표 정의, 데이터 기반 의사결정 구조</div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon">📚</div>
+            <div class="action-title">매뉴얼 · 교육 · CRM 일원화</div>
+            <div class="action-desc">전국 지점이 동일한 기준과 목표로 움직이도록 정렬</div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon">📊</div>
+            <div class="action-title">리포팅 체계 정착</div>
+            <div class="action-desc">주·월간 리포트 정례화, 신규점 표준 온보딩</div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon">🚀</div>
+            <div class="action-title">신규 지점 오픈 총괄</div>
+            <div class="action-desc">셋업부터 매출 안정화까지 전 과정 운영</div>
+          </div>
+        </div>
+
+        <div class="eureka-results">
+          <div class="result-card">
+            <div class="result-num">80%</div>
+            <div class="result-label">신규 지점 3개월<br>매출 안정화율</div>
+          </div>
+          <div class="result-card">
+            <div class="result-num">+10%p</div>
+            <div class="result-label">고객 재방문률<br>(3개월 이내)</div>
+          </div>
+          <div class="result-card">
+            <div class="result-num">+7%p</div>
+            <div class="result-label">캠페인 전환율<br>+21% ATV 동반</div>
+          </div>
+          <div class="result-card">
+            <div class="result-num">4.7</div>
+            <div class="result-label">CSAT / 5.0<br>지점 편차 감소</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 — CH.03 EUREKA (quote) -->
+    <section class="slide s-eureka-quote">
+      <div class="slide-inner">
+        <div class="eq-wrap">
+          <span class="eq-label">의료 시장 깨달음</span>
+          <p class="eq-p">노화는 멈출 수 없다는 통념이 자본과 기술 앞에서 점점 의미를 잃고 있다는 사실을 체감했다.</p>
+          <p class="eq-p">재생의학과 미용 의료는 더 이상 사치재가 아니라, 일상에 스며든 준필수재 산업이다.</p>
+          <p class="eq-p"><strong>자본 · 기술 · 반복 구매 · 장기 수요</strong>가 동시에 작동하는 — 전략기획자가 평생 살 시장을 만났다.</p>
+          <div class="eq-comments">
+            <p class="comment">"완전 셋업멤버. 시스템이 없는 곳에서 시스템을 만들었다."</p>
+            <p class="comment">"여기서 처음으로 '의료 산업'이 진짜로 보였다 — 평생 살 시장을 정했다."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9 — CH.04 SCALE UP -->
+    <section class="slide s-scale">
+      <div class="slide-inner">
+        <div class="chapter-meta">
+          <span class="ch-num">CH.04</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">현재</span>
+        </div>
+        <h3 class="ch-title">SCALE UP 🌐</h3>
+        <p class="ch-sub">1개 브랜드 다지점에서, 여러 병원 동시 운영으로 — 운영 단위가 한 단계 확장됐다</p>
+
+        <div class="scale-header">
+          <div>
+            <p class="scale-role"><strong>메디힘 플랫폼 사업부 책임연구원 / 운영 파트 파트장.</strong></p>
+            <p class="scale-role">국내 다지점에서 해외 환자 인바운드로, 한 브랜드 운영에서 여러 병원 동시 운영으로. 같은 일을 더 큰 스케일에서.</p>
+          </div>
+          <div class="scale-diagram">
+            <div class="scale-d-title">SCALE EVOLUTION</div>
+            <div class="scale-stages">
+              <div class="scale-stage">
+                <div class="scale-stage-label">PREVIOUS</div>
+                <div class="scale-stage-org">디렉터홀딩스</div>
+                <div class="scale-stage-unit">1개 브랜드<br>다지점</div>
+              </div>
+              <div class="scale-arrow">→</div>
+              <div class="scale-stage now">
+                <div class="scale-stage-label">NOW</div>
+                <div class="scale-stage-org">메디힘</div>
+                <div class="scale-stage-unit">여러 병원<br>다국가 환자</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scale-list-wrap">
+          <div class="scale-list-label">진행 중인 일</div>
+          <ul class="scale-list">
+            <li>약 10개 의료기관 파트너십 협업 구조 구축</li>
+            <li>화상상담 기반 비대면 진료 프로세스 설계</li>
+            <li>수익모델 · 수수료 · 환불 · 컴플라이언스 종합 정책</li>
+            <li>KPI 측정 구조 설계 · 외부 에이전시 · 개발사 협업 총괄</li>
+          </ul>
+        </div>
+
+        <div class="scale-comments-row">
+          <p class="comment">"한 브랜드의 여러 지점에서, 여러 브랜드를 동시에 — 운영 단위가 한 단계 확장됐다."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 — CH.05 NEXT -->
+    <section class="slide s-next">
+      <div class="slide-inner">
+        <div class="chapter-meta" style="justify-content: center; max-width: 240px; margin: 0 auto 20px;">
+          <span class="ch-num">CH.05</span>
+          <span class="ch-line"></span>
+          <span class="ch-year">NEXT</span>
+        </div>
+        <h3 class="next-title">다음 스케일</h3>
+        <p class="next-sub">다지점 → 여러 병원 → 500+ 의료기관 네트워크</p>
+
+        <div class="next-evo">
+          <div class="next-card">
+            <div class="next-c-label">PREVIOUS</div>
+            <div class="next-c-name">디렉터홀딩스</div>
+            <div class="next-c-detail">1개 브랜드 · 다지점</div>
+          </div>
+          <div class="next-arrow">→</div>
+          <div class="next-card">
+            <div class="next-c-label">NOW</div>
+            <div class="next-c-name">메디힘</div>
+            <div class="next-c-detail">여러 병원 · 다국가 환자</div>
+          </div>
+          <div class="next-arrow">→</div>
+          <div class="next-card future">
+            <div class="next-c-label">NEXT</div>
+            <div class="next-c-name">MJFLB</div>
+            <div class="next-c-detail">500+ 의료기관 · 다국가 인플루언서</div>
+          </div>
+        </div>
+
+        <p class="next-msg">
+          다지점 표준화 방법론(<strong>80% 매출 안정화</strong>)을 500+ 의료기관 네트워크에 이식. 검증된 인바운드 모델의 다국가 확장 사업 구조 설계.
+        </p>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 — MY FOUR PILLARS (NEW) -->
+    <section class="slide s-pillars" id="pillars">
+      <div class="slide-inner">
+        <div class="pillars-head">
+          <span class="eyebrow pillars-eyebrow">MY FOUR PILLARS</span>
+          <h2 class="pillars-title">한 사람을 만든 네 개의 기둥</h2>
+          <p class="pillars-sub">11년 커리어에서 추출한 — 다음 회사에 가져갈 자산.</p>
+        </div>
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">⚡</div>
+            <div class="pillar-num">01</div>
+            <div class="pillar-name">GRIT 정신</div>
+            <div class="pillar-tag">스타트업에서 배운 것</div>
+            <div class="pillar-desc">머지홀딩스에서 사원으로 시작해 팀장까지. "안 되면 되게 하라"를 머리가 아니라 몸으로 익혔다. 무엇이든 다 하는 사람.</div>
+            <div class="pillar-evidence">증거 · 사원→팀장 성장, 사원이지만 IR Deck 작성, 이벤트 매출 +260%</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">🔧</div>
+            <div class="pillar-num">02</div>
+            <div class="pillar-name">0→1 BUILDER</div>
+            <div class="pillar-tag">진짜 셋업 경험에서 나온 것</div>
+            <div class="pillar-desc">디렉터홀딩스에서 병원 MOT · 콜센터 · OKR · 매뉴얼을 0에서 만들었다. 메디힘에서도 글로벌 의료관광 플랫폼을 0에서 셋업. 시스템이 없는 곳에서 시스템을 만드는 사람.</div>
+            <div class="pillar-evidence">증거 · 디렉터홀딩스 셋업멤버, 신규점 80% 안정화, 메디힘 플랫폼 0→1</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">🏗️</div>
+            <div class="pillar-num">03</div>
+            <div class="pillar-name">STRUCTURED</div>
+            <div class="pillar-tag">실전에서 부딪히며 배운 것</div>
+            <div class="pillar-desc">창업 시도, 다지점 표준화, 사업기획 End-to-End. 책이 아니라 시장에서 직접 부딪히며 사업 구조화를 익혔다. 감각이 아니라 구조로 성과를 만드는 사람.</div>
+            <div class="pillar-evidence">증거 · 창업 시도 (호주 현지), BM End-to-End 설계, 다지점 표준화 방법론</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">🤖</div>
+            <div class="pillar-num">04</div>
+            <div class="pillar-name">AI-LEVERAGED</div>
+            <div class="pillar-tag">미래의 일하는 방식</div>
+            <div class="pillar-desc">ChatGPT · Claude · NotebookLM · Perplexity를 도구별로 분기. 리서치 → 가설 → 초안 사이클을 1주에서 2~3일로 압축. 같은 인력으로 2~3배 빠른 산출을 만드는 사람.</div>
+            <div class="pillar-evidence">증거 · 4개 도구 일상 활용, 사업기획 사이클 단축, AI 워크플로 정착</div>
+          </div>
+        </div>
+        <div class="pillars-bonus">
+          <span class="pillars-bonus-icon">🌐</span>
+          <span class="pillars-bonus-text">
+            <strong>+ INDUSTRY INSIGHT</strong> · 결제 플랫폼 · 유학 플랫폼 · 뷰티 MSO · 의료관광 — 네 개 산업을 거치며 각 시장의 BM과 고객 행동 패턴을 직접 체험했다. 산업을 넘나드는 패턴 인식 능력.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 — OUTCOMES -->
+    <section class="slide s-outcomes" id="outcomes">
+      <div class="slide-inner">
+        <div class="out-head">
+          <span class="eyebrow out-eyebrow">PROVEN OUTCOMES</span>
+          <h2 class="out-title">정량으로 검증된 성과</h2>
+          <p class="out-sub">감각이 아니라 구조로 만든 결과.</p>
+        </div>
+        <div class="out-metrics">
+          <div class="out-card">
+            <div class="out-num">80<span class="u">%</span></div>
+            <div class="out-card-label">신규 지점 매출 안정화율</div>
+            <div class="out-card-ctx">3개월 내 · 디렉터홀딩스</div>
+          </div>
+          <div class="out-card">
+            <div class="out-num">+10<span class="u">%p</span></div>
+            <div class="out-card-label">고객 재방문률 상승</div>
+            <div class="out-card-ctx">CRM 운영 · 디렉터홀딩스</div>
+          </div>
+          <div class="out-card">
+            <div class="out-num">+7<span class="u">%p</span></div>
+            <div class="out-card-label">캠페인 전환율 향상</div>
+            <div class="out-card-ctx">+21% ATV 동반 상승</div>
+          </div>
+          <div class="out-card">
+            <div class="out-num">10<span class="u">곳</span></div>
+            <div class="out-card-label">의료기관 파트너십 구축</div>
+            <div class="out-card-ctx">메디힘 운영 · 진행 중</div>
+          </div>
+        </div>
+        <div class="out-secondary">
+          <div class="out-secondary-item"><strong>+260%</strong> 이벤트 평균 매출</div>
+          <div class="out-secondary-item"><strong>98</strong> 브랜드 입점</div>
+          <div class="out-secondary-item"><strong>4.7/5.0</strong> 고객 만족도</div>
+          <div class="out-secondary-item"><strong>9년</strong> 중한 번역 누적</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 — SYSTEM BUILDER -->
+    <section class="slide s-system">
+      <div class="slide-inner">
+        <div class="sys-header">
+          <span class="eyebrow sys-eyebrow">SYSTEM BUILDER</span>
+          <h2 class="sys-title">무체계에서 체계로 🔧</h2>
+          <p class="sys-sub">디렉터홀딩스 · 완전 셋업멤버 · 진짜 0→1</p>
+        </div>
+        <div class="sys-grid">
+          <div class="sys-narr">
+            <p>전국 피부과 네트워크가 각자 다른 방식으로 운영되던 환경에서, <strong>OKR과 KPI 체계를 처음부터 설계</strong>하고 매뉴얼·교육·CRM을 일원화했습니다.</p>
+            <p>지점별 표준 매뉴얼 부재, 감각 기반 운영, 큰 편차 — 이 세 가지를 정렬된 시스템으로 바꾸는 작업이었습니다.</p>
+            <p>현장 직원의 행동까지 동일한 방향으로 모여, <strong>분산된 조직이 공동의 목표로 움직이도록</strong> 만들었습니다.</p>
+          </div>
+          <div class="ba-tbl">
+            <div class="ba-row"><div class="ba-before">표준 매뉴얼 없음</div><div class="ba-arrow">→</div><div class="ba-after">전국 표준화 체계</div></div>
+            <div class="ba-row"><div class="ba-before">감각 기반 운영</div><div class="ba-arrow">→</div><div class="ba-after">OKR · KPI 기반 운영</div></div>
+            <div class="ba-row"><div class="ba-before">지점별 편차 큼</div><div class="ba-arrow">→</div><div class="ba-after">편차 감소 · 정렬</div></div>
+            <div class="ba-row"><div class="ba-before">신규점 매출 불안정</div><div class="ba-arrow">→</div><div class="ba-after">3개월 80% 안정화</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13 — AI WORKFLOW -->
+    <section class="slide s-ai">
+      <div class="slide-inner">
+        <div class="ai-head">
+          <span class="eyebrow ai-eyebrow">HOW I WORK · AI-LEVERAGED</span>
+          <h2 class="ai-title">AI 활용 업무 방식 🤖</h2>
+          <p class="ai-sub">각 도구의 강점을 분기해 활용. 도구가 결정하지 않고, 사람이 결정한다.</p>
+        </div>
+        <div class="ai-flow">
+          <div class="ai-step">
+            <div class="ai-icon">🔍</div>
+            <div class="ai-tool">Perplexity</div>
+            <div class="ai-use">실시간 리서치<br>시장·경쟁사 탐색</div>
+          </div>
+          <div class="ai-arr">→</div>
+          <div class="ai-step">
+            <div class="ai-icon">📚</div>
+            <div class="ai-tool">NotebookLM</div>
+            <div class="ai-use">다수 자료 통합<br>내부 KB 구축</div>
+          </div>
+          <div class="ai-arr">→</div>
+          <div class="ai-step">
+            <div class="ai-icon">✍️</div>
+            <div class="ai-tool">Claude / GPT</div>
+            <div class="ai-use">BM 가설 검증<br>제안 · SOP 초안</div>
+          </div>
+          <div class="ai-arr">→</div>
+          <div class="ai-step outcome">
+            <div class="ai-icon">🎯</div>
+            <div class="ai-tool">실무 적용</div>
+            <div class="ai-use">검증 · 결정 · 실행<br>(사람의 영역)</div>
+          </div>
+        </div>
+        <div class="ai-outcome-wrap">
+          <div class="ai-outcome-row">
+            <span class="ai-out-text">리서치 → 가설 → 초안 사이클을</span>
+            <span class="ai-out-num">1주 → 2~3일</span>
+            <span class="ai-out-text">로 압축</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15 — ROADMAP -->
+    <section class="slide s-roadmap" id="roadmap">
+      <div class="slide-inner">
+        <div class="rm-head">
+          <span class="eyebrow rm-eyebrow">FOR MJFLB</span>
+          <h2 class="rm-title">채용 후 기대 산출 🎯</h2>
+          <p class="rm-sub">검증된 운영 방법론과 의료관광 운영 경험을 500+ 의료기관 네트워크에 이식.</p>
+        </div>
+        <div class="rm-grid">
+          <div class="rm-card">
+            <div class="rm-period">6 MONTHS</div>
+            <div class="rm-phase">안착 + Quick Win</div>
+            <ul class="rm-list">
+              <li>500+ 의료기관 네트워크 운영 진단 · 표준화 우선순위 도출</li>
+              <li>핵심 KPI 체계 진단 및 OKR 재설계 제안</li>
+              <li>AI 활용 운영 프로세스 도입으로 팀 산출 속도 개선</li>
+            </ul>
+          </div>
+          <div class="rm-card">
+            <div class="rm-period">1 YEAR</div>
+            <div class="rm-phase">구조 정착</div>
+            <ul class="rm-list">
+              <li>의료기관 운영 표준화 매뉴얼 v1.0 배포</li>
+              <li>인플루언서 → 상담 → 내원 → 시술 funnel KPI 정의 · 개선</li>
+              <li>신규 의료기관 온보딩 프로세스 표준화</li>
+            </ul>
+          </div>
+          <div class="rm-card">
+            <div class="rm-period">2 YEARS</div>
+            <div class="rm-phase">확장 단계</div>
+            <ul class="rm-list">
+              <li>검증된 인바운드 모델의 신규 시장 진출 사업 구조 설계</li>
+              <li>신규 서비스 패키지 BM 설계 · 파일럿 운영</li>
+              <li>사업 방향성에 대한 전략 제안 정례화</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 16 — CLOSING + CONTACT -->
+    <section class="slide s-closing" id="closing">
+      <div class="slide-inner">
+        <div class="closing-wrap">
+          <p class="closing-quote">
+            "병원과 의료기관은 단순 서비스 제공 공간이 아니라 <span class="hi">브랜드 시스템과 운영 구조를 갖춘 하나의 기업</span>입니다. 프리미엄일수록 감각보다 구조가 성과를 만듭니다."
+          </p>
+          <p class="closing-name">— 신유경</p>
+          <div class="contact-box">
+            <a href="mailto:ceres0409@gmail.com">📧 ceres0409@gmail.com</a>
+            <span class="contact-sep">·</span>
+            <span>📱 010-3089-9889</span>
+          </div>
+          <div class="closing-meta">
+            © 2026 SHIN YUKYUNG · STRATEGY PLANNER<br>
+            BUILT WITH CHATGPT · CLAUDE · NOTEBOOKLM · PERPLEXITY
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  // Scroll progress bar
+  const progress = document.getElementById('progress');
+  const scrollTopBtn = document.getElementById('scroll-top');
+
+  function updateProgress() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    progress.style.width = pct + '%';
+
+    // Show scroll-to-top button after 300px
+    if (scrollTop > 300) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // Scroll to top
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Fade-in on scroll using IntersectionObserver
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -80px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.slide').forEach(slide => {
+    observer.observe(slide);
+  });
+
+  // Keyboard navigation — jump to next/prev section
+  const slides = Array.from(document.querySelectorAll('.slide'));
+
+  function getCurrentSlideIndex() {
+    const scrollY = window.pageYOffset + window.innerHeight / 3;
+    for (let i = slides.length - 1; i >= 0; i--) {
+      if (slides[i].offsetTop <= scrollY) return i;
+    }
+    return 0;
+  }
+
+  function scrollToSlide(index) {
+    const target = slides[Math.max(0, Math.min(slides.length - 1, index))];
+    window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    // Only respond when not typing in an input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    const current = getCurrentSlideIndex();
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      scrollToSlide(current + 1); e.preventDefault();
+    }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      scrollToSlide(current - 1); e.preventDefault();
+    }
+    if (e.key === 'Home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' }); e.preventDefault();
+    }
+    if (e.key === 'End') {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+      e.preventDefault();
+    }
+  });
+</script>
+
+</body>
+</html>
